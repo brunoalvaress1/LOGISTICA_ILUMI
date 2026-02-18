@@ -1,0 +1,1596 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ilumi • Logística</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --app-bg: linear-gradient(135deg, #ffffff 0%, #f0f8f0 50%, #e8f5e8 100%);
+      --card-bg: #ffffff;
+      --border: #c8e6c9;
+      --hover-bg: #e8f5e8;
+      --text-primary: #2e7d32;
+      --text-muted: #689f38;
+      --accent: #4caf50;
+      --success: #388e3c;
+      --danger: #d32f2f;
+      --shadow: 0 4px 20px rgba(46,125,50,0.1);
+    }
+
+    body {
+      background: var(--app-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.7;
+    }
+
+    .sidebar {
+      background: #ffffff;
+      min-height: 100vh;
+      border-right: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(46,125,50,0.15);
+      border-color: var(--accent);
+    }
+
+    .muted {
+      color: var(--text-muted);
+    }
+
+    .soft-hr {
+      border-color: var(--border) !important;
+    }
+
+    .btn-outline-light {
+      border-color: var(--border);
+      color: var(--text-primary);
+      border-radius: 8px;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-outline-light:hover {
+      background: var(--hover-bg);
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .btn-light {
+      background: var(--accent);
+      border: none;
+      color: #ffffff;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    .btn-light:hover {
+      background: var(--success);
+    }
+
+    .badge-soft {
+      background: rgba(76,175,80,0.1);
+      border: 1px solid var(--accent);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .click {
+      cursor: pointer;
+    }
+
+    .table-dark {
+      --bs-table-bg: #ffffff;
+      --bs-table-border-color: var(--border);
+    }
+
+    .form-control, .form-select {
+      background: #ffffff;
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--accent);
+      box-shadow: none;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+
+    .modal-header, .modal-footer {
+      border-color: var(--border);
+    }
+
+    .btn-close {
+      filter: invert(0);
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .card {
+        margin: 0.5rem;
+        padding: 1rem;
+      }
+      .sidebar {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-12 col-md-2 sidebar p-3">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-box-seam fs-5"></i>
+        <div class="fw-semibold">Ilumi • Logística</div>
+      </div>
+
+      <div class="small muted mb-3">
+        Logado: <span id="userEmail">—</span>
+      </div>
+
+      <div class="d-grid gap-2">
+        <button class="btn btn-outline-light" id="btnDash">
+          <i class="bi bi-speedometer2 me-1"></i> Dashboard
+        </button>
+
+        <button class="btn btn-outline-light" id="btnMotoristas">
+          <i class="bi bi-people me-1"></i> Motoristas
+        </button>
+
+        <button class="btn btn-outline-light" id="btnServicos">
+          <i class="bi bi-clipboard-check me-1"></i> Serviços
+        </button>
+
+        <button class="btn btn-outline-light" id="btnVeiculos">
+          <i class="bi bi-truck me-1"></i> Veículos
+        </button>
+
+        <button class="btn btn-danger mt-2" id="btnLogout">
+          <i class="bi bi-box-arrow-right me-1"></i> Sair
+        </button>
+      </div>
+
+      <hr class="soft-hr my-3">
+
+      <div class="small muted">
+        Dica: motoristas são ativados em<br>
+        <span class="badge badge-soft">primeiro_acesso.html</span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="col-12 col-md-10 p-4">
+
+      <!-- DASHBOARD -->
+      <div id="viewDash">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h4 class="m-0">Dashboard</h4>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMotorista">
+              <i class="bi bi-person-plus me-1"></i> Pré-cadastrar motorista
+            </button>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <div class="card p-3">
+              <div class="muted">Motoristas (ativos)</div>
+              <div class="fs-2 fw-bold" id="kpiMotoristas">0</div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="card p-3">
+              <div class="muted">Próprios</div>
+              <div class="fs-2 fw-bold" id="kpiProprios">0</div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="card p-3">
+              <div class="muted">Terceiros</div>
+              <div class="fs-2 fw-bold" id="kpiTerceiros">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-3 mt-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-semibold">Pendentes (ainda sem senha)</div>
+              <div class="small muted">Pré-cadastros em profiles_pending</div>
+            </div>
+            <button class="btn btn-outline-light btn-sm" id="btnRefreshDash">
+              <i class="bi bi-arrow-repeat me-1"></i> Atualizar
+            </button>
+          </div>
+          <hr class="soft-hr my-3">
+          <div id="listaPendentes" class="muted">Carregando...</div>
+        </div>
+
+        <div class="card p-3 mt-3">
+          <div class="fw-semibold mb-2">Histórico de Movimentação (últimas 20)</div>
+          <div id="historicoJornadas">Carregando...</div>
+        </div>
+
+        <div class="card p-3 mt-3">
+          <div class="fw-semibold mb-2">Status dos Caminhões</div>
+          <div id="statusCaminhoes">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- MOTORISTAS -->
+      <div id="viewMotoristas" class="d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h4 class="m-0">Motoristas</h4>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMotorista">
+            <i class="bi bi-person-plus me-1"></i> Pré-cadastrar motorista
+          </button>
+        </div>
+
+        <div class="card p-3">
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-5">
+              <label class="form-label muted">Buscar</label>
+              <input id="searchTxt" class="form-control" placeholder="Nome ou email">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label muted">Tipo</label>
+              <select id="filterTipo" class="form-select">
+                <option value="">Todos</option>
+                <option value="proprio">Próprio</option>
+                <option value="terceiro">Terceiro</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-2">
+              <label class="form-label muted">Ativo</label>
+              <select id="filterAtivo" class="form-select">
+                <option value="">Todos</option>
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-2 d-grid">
+              <button class="btn btn-outline-light" id="btnApplyFilters">
+                Filtrar
+              </button>
+            </div>
+          </div>
+
+          <hr class="soft-hr my-3">
+
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Tipo</th>
+                  <th>Ativo</th>
+                  <th style="width: 220px;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyMotoristas">
+                <tr><td colspan="5" class="muted">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVIÇOS -->
+      <div id="viewServicos" class="d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h4 class="m-0">Serviços</h4>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCriarServico">
+            <i class="bi bi-plus-circle me-1"></i> Criar serviço
+          </button>
+        </div>
+
+        <div class="card p-3">
+          <div id="listaServicos" class="muted">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- VEÍCULOS -->
+      <div id="viewVeiculos" class="d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h4 class="m-0">Veículos</h4>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalVeiculo">
+            <i class="bi bi-plus-circle me-1"></i> Novo veículo
+          </button>
+        </div>
+
+        <div class="card p-3">
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-6">
+              <label class="form-label muted">Buscar placa/modelo</label>
+              <input id="vehSearchTxt" class="form-control" placeholder="Ex: ABC1D23">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label muted">Tipo</label>
+              <select id="vehFilterTipo" class="form-select">
+                <option value="">Todos</option>
+                <option value="empresa">Empresa</option>
+                <option value="terceiro">Terceiro</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label muted">Ativo</label>
+              <select id="vehFilterAtivo" class="form-select">
+                <option value="">Todos</option>
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </select>
+            </div>
+          </div>
+
+          <hr class="soft-hr my-3">
+
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Placa</th>
+                  <th>Modelo</th>
+                  <th>Tipo</th>
+                  <th>Ativo</th>
+                  <th style="width: 260px;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyVeiculos">
+                <tr><td colspan="5" class="muted">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card p-3 mt-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-semibold">Histórico de todos os veículos</div>
+              <div class="small muted">Últimas 50 entregas/coletas concluídas (filtra por placa)</div>
+            </div>
+            <button class="btn btn-outline-light btn-sm" id="btnRefreshHistAll">
+              <i class="bi bi-arrow-repeat me-1"></i> Atualizar
+            </button>
+          </div>
+          <hr class="soft-hr my-3">
+
+          <div class="row g-2 align-items-end mb-2">
+            <div class="col-12 col-md-4">
+              <label class="form-label muted">Filtrar por placa</label>
+              <input id="histPlacaFilter" class="form-control" placeholder="ABC1D23 (opcional)">
+            </div>
+          </div>
+
+          <div id="historicoAllVeiculos" class="muted">Carregando...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PRÉ-CADASTRAR MOTORISTA -->
+<div class="modal fade" id="modalMotorista" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Pré-cadastrar motorista</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="small muted mb-3">
+          Isso cria um registro em <span class="badge badge-soft">profiles_pending</span>.
+          O motorista cria a senha em <b>primeiro_acesso.html</b>.
+        </div>
+
+        <form id="formCriarMotorista" class="vstack gap-2">
+          <div>
+            <label class="form-label muted">Nome</label>
+            <input id="mNome" class="form-control" required>
+          </div>
+
+          <div>
+            <label class="form-label muted">Email</label>
+            <input id="mEmail" type="email" class="form-control" required>
+          </div>
+
+          <div>
+            <label class="form-label muted">Tipo</label>
+            <select id="mTipo" class="form-select" required>
+              <option value="">Selecione</option>
+              <option value="proprio">Próprio</option>
+              <option value="terceiro">Terceiro</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" type="submit" id="btnCriar">
+            Salvar pré-cadastro
+          </button>
+
+          <div class="small" id="createMsg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR MOTORISTA -->
+<div class="modal fade" id="modalEditarMotorista" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar motorista</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="formEditarMotorista">
+        <div class="modal-body vstack gap-2">
+          <input type="hidden" id="editMotoristaId">
+          <div>
+            <label class="form-label muted">Nome</label>
+            <input id="editMotoristaNome" class="form-control" required>
+          </div>
+          <div>
+            <label class="form-label muted">Email</label>
+            <input id="editMotoristaEmail" class="form-control" disabled>
+          </div>
+          <div>
+            <label class="form-label muted">Tipo</label>
+            <select id="editMotoristaTipo" class="form-select" required>
+              <option value="proprio">Próprio</option>
+              <option value="terceiro">Terceiro</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label muted">Ativo</label>
+            <select id="editMotoristaAtivo" class="form-select" required>
+              <option value="true">Ativo</option>
+              <option value="false">Inativo</option>
+            </select>
+          </div>
+          <div class="small" id="editMotoristaMsg"></div>
+        </div>
+        <div class="modal-footer">
+                    <button class="btn btn-outline-light" data-bs-dismiss="modal" type="button">Cancelar</button>
+          <button class="btn btn-primary" type="submit">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CRIAR SERVIÇO -->
+<div class="modal fade" id="modalCriarServico" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Criar serviço</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formCriarServico" class="vstack gap-2">
+          <div>
+            <label class="form-label muted">Tipo</label>
+            <select id="sTipo" class="form-select" required>
+              <option value="entrega">Entrega</option>
+              <option value="coleta">Coleta</option>
+              <option value="entrega_coleta">Entrega + Coleta</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label muted">Cliente</label>
+            <input id="sCliente" class="form-control" required>
+          </div>
+
+          <div>
+            <label class="form-label muted">Endereço completo</label>
+            <textarea id="sEndereco" class="form-control" rows="3" required></textarea>
+          </div>
+
+          <div>
+            <label class="form-label muted">Observações</label>
+            <textarea id="sObs" class="form-control" rows="2"></textarea>
+          </div>
+
+          <div>
+            <label class="form-label muted">Atribuir motorista</label>
+            <select id="sDriver" class="form-select">
+              <option value="">(sem motorista)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label muted">Selecionar veículo</label>
+            <select id="sVeiculo" class="form-select">
+              <option value="">(sem veículo)</option>
+            </select>
+            <div class="form-text muted">Se atribuir motorista, o veículo será usado na jornada.</div>
+          </div>
+
+          <button class="btn btn-primary" type="submit" id="btnCriarServico">
+            Criar serviço
+          </button>
+
+          <div class="small" id="servicoMsg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: VEÍCULO -->
+<div class="modal fade" id="modalVeiculo" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="m-0">Novo veículo</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form id="formVeiculo">
+        <div class="modal-body vstack gap-2">
+          <div>
+            <label class="form-label muted">Placa</label>
+            <input id="vPlaca" class="form-control" required>
+          </div>
+
+          <div>
+            <label class="form-label muted">Modelo</label>
+            <input id="vModelo" class="form-control">
+          </div>
+
+          <div>
+            <label class="form-label muted">Tipo</label>
+            <select id="vTipo" class="form-select">
+              <option value="empresa">Empresa</option>
+              <option value="terceiro">Terceiro</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" type="submit">Salvar</button>
+          <div class="small" id="veiculoMsg"></div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR VEÍCULO -->
+<div class="modal fade" id="modalEditarVeiculo" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar veículo</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="formEditarVeiculo">
+        <div class="modal-body vstack gap-2">
+          <input type="hidden" id="editVeiculoId">
+
+          <div>
+            <label class="form-label muted">Placa</label>
+            <input id="editVeiculoPlaca" class="form-control" required>
+          </div>
+
+          <div>
+            <label class="form-label muted">Modelo</label>
+            <input id="editVeiculoModelo" class="form-control">
+          </div>
+
+          <div>
+            <label class="form-label muted">Tipo</label>
+            <select id="editVeiculoTipo" class="form-select" required>
+              <option value="empresa">Empresa</option>
+              <option value="terceiro">Terceiro</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label muted">Ativo</label>
+            <select id="editVeiculoAtivo" class="form-select" required>
+              <option value="true">Ativo</option>
+              <option value="false">Inativo</option>
+            </select>
+          </div>
+
+          <div class="small" id="editVeiculoMsg"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-light" data-bs-dismiss="modal" type="button">Cancelar</button>
+          <button class="btn btn-primary" type="submit">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./js/supabase.js"></script>
+
+<script>
+  // -----------------------------
+  // Helpers
+  // -----------------------------
+  const esc = (s) => String(s ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+  const toast = (msg) => alert(msg); // fallback simples
+
+  function setMsg(id, t, ok=false){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.className = "small " + (ok ? "text-success" : "text-warning");
+    el.textContent = t || "";
+  }
+
+  function showView(name){
+    document.getElementById("viewDash").classList.toggle("d-none", name !== "dash");
+    document.getElementById("viewMotoristas").classList.toggle("d-none", name !== "motoristas");
+    document.getElementById("viewServicos").classList.toggle("d-none", name !== "servicos");
+    document.getElementById("viewVeiculos").classList.toggle("d-none", name !== "veiculos");
+  }
+
+  // -----------------------------
+  // Função assignServiceWithJourney (definida aqui para logistica.html)
+  // -----------------------------
+  async function assignServiceWithJourney(serviceId, driverId, veiculoId = null) {
+    // Verificar se motorista tem jornada aberta hoje
+    const today = new Date().toISOString().split('T')[0];
+    const { data: jornada, error: jErr } = await sb
+      .from("jornadas")
+      .select("id")
+      .eq("motorista_id", driverId)
+      .eq("aberta", true)
+      .gte("aberta_em", `${today}T00:00:00Z`)
+      .maybeSingle();
+
+    if (jErr) throw jErr;
+
+    let jornadaId;
+    if (!jornada) {
+      // Criar jornada aberta para hoje com veículo e km_inicial
+      const { data: newJornada, error: createErr } = await sb
+        .from("jornadas")
+        .insert([{
+          motorista_id: driverId,
+          veiculo_id: veiculoId,  // Usar veículo selecionado
+          aberta: true,
+          km_inicial: 0,  // Adicionar km_inicial obrigatório (pode ser atualizado no check-in)
+          aberta_em: new Date().toISOString()
+        }])
+        .select("id")
+        .single();
+      if (createErr) throw createErr;
+      jornadaId = newJornada.id;
+    } else {
+      jornadaId = jornada.id;
+    }
+
+    // Atribuir serviço à jornada (se serviceId fornecido)
+    if (serviceId) {
+      const { error } = await sb
+        .from("servicos")
+        .update({
+          driver_id: driverId,
+          jornada_id: jornadaId,
+          status: "em_rota",
+          assigned_at: new Date().toISOString()
+        })
+        .eq("id", serviceId)
+        .select("*")
+        .single();
+      if (error) throw error;
+    }
+
+    return { jornadaId };
+  }
+
+  // -----------------------------
+  // Auth
+  // -----------------------------
+  async function ensureLogged() {
+    const { data } = await sb.auth.getSession();
+    const user = data?.session?.user;
+    if (!user) { location.href = "index.html"; return null; }
+    document.getElementById("userEmail").textContent = user.email || "—";
+    return user;
+  }
+
+  // -----------------------------
+  // Dashboard + Motoristas
+  // -----------------------------
+  let cacheMotoristas = [];
+  let cacheVeiculos = [];
+
+  async function loadPendentes(){
+    const el = document.getElementById("listaPendentes");
+    el.innerHTML = "Carregando...";
+
+    const { data, error } = await sb
+      .from("profiles_pending")
+      .select("email,nome,tipo,created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) { el.innerHTML = `<div class="text-danger">${esc(error.message)}</div>`; return; }
+
+    if (!data?.length) { el.innerHTML = `<div class="muted">Nenhum pré-cadastro pendente.</div>`; return; }
+
+    el.innerHTML = data.map(p => `
+      <div class="border-bottom py-2" style="border-color:#c8e6c9!important;">
+        <div class="fw-semibold text-dark">${esc(p.nome)}</div>
+        <div class="small muted">${esc(p.email)} • ${esc(p.tipo)} • ${new Date(p.created_at).toLocaleString("pt-BR")}</div>
+      </div>
+    `).join("");
+  }
+
+  async function loadMotoristas(){
+    const { data, error } = await sb
+      .from("profiles")
+      .select("id,role,tipo,nome,email,ativo,created_at")
+      .in("role", ["motorista_proprio","motorista_terceiro"])
+      .order("created_at", { ascending: false });
+
+    const tbody = document.getElementById("tbodyMotoristas");
+
+    if (error) {
+      tbody.innerHTML = `<tr><td colspan="5" class="text-danger">${esc(error.message)}</td></tr>`;
+      return;
+    }
+
+    cacheMotoristas = data || [];
+
+    const ativos = cacheMotoristas.filter(m => m.ativo !== false);
+    document.getElementById("kpiMotoristas").textContent = ativos.length;
+    document.getElementById("kpiProprios").textContent = ativos.filter(m => m.role === "motorista_proprio").length;
+    document.getElementById("kpiTerceiros").textContent = ativos.filter(m => m.role === "motorista_terceiro").length;
+
+    applyMotoristasFilters();
+  }
+
+  function applyMotoristasFilters(){
+    const q = (document.getElementById("searchTxt").value || "").trim().toLowerCase();
+    const tipo = document.getElementById("filterTipo").value;
+    const ativo = document.getElementById("filterAtivo").value;
+
+    let rows = [...cacheMotoristas];
+
+    if (q) rows = rows.filter(m =>
+      (m.nome || "").toLowerCase().includes(q) ||
+      (m.email || "").toLowerCase().includes(q)
+    );
+
+    if (tipo) rows = rows.filter(m => m.tipo === tipo);
+    if (ativo) rows = rows.filter(m => String(!!m.ativo) === ativo);
+
+    const tbody = document.getElementById("tbodyMotoristas");
+
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="5" class="muted">Nenhum motorista encontrado.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(m => `
+      <tr>
+        <td class="fw-semibold">${esc(m.nome)}</td>
+        <td class="muted small">${esc(m.email)}</td>
+        <td><span class="badge bg-secondary">${esc(m.tipo)}</span></td>
+        <td>${m.ativo ? `<span class="badge bg-success">ativo</span>` : `<span class="badge bg-danger">inativo</span>`}</td>
+        <td>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-light btn-sm" data-edit-motorista="${m.id}">
+              <i class="bi bi-pencil me-1"></i> Editar
+            </button>
+            <button class="btn btn-outline-light btn-sm" data-toggle-motorista="${m.id}">
+              <i class="bi bi-power me-1"></i> ${m.ativo ? "Desativar" : "Ativar"}
+            </button>
+            <button class="btn btn-danger btn-sm" data-del-motorista="${m.id}">
+              <i class="bi bi-trash me-1"></i> Excluir
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+
+    bindMotoristasActions();
+  }
+
+  function bindMotoristasActions(){
+    document.querySelectorAll("[data-edit-motorista]").forEach(btn => {
+      btn.onclick = () => openEditarMotorista(btn.getAttribute("data-edit-motorista"));
+    });
+    document.querySelectorAll("[data-toggle-motorista]").forEach(btn => {
+      btn.onclick = () => toggleMotorista(btn.getAttribute("data-toggle-motorista"));
+    });
+    document.querySelectorAll("[data-del-motorista]").forEach(btn => {
+      btn.onclick = () => deleteMotorista(btn.getAttribute("data-del-motorista"));
+    });
+  }
+
+  function openEditarMotorista(id){
+    const m = cacheMotoristas.find(x => x.id === id);
+    if(!m) return;
+
+    document.getElementById("editMotoristaId").value = m.id;
+    document.getElementById("editMotoristaNome").value = m.nome || "";
+    document.getElementById("editMotoristaEmail").value = m.email || "";
+    document.getElementById("editMotoristaTipo").value = m.tipo || "proprio";
+    document.getElementById("editMotoristaAtivo").value = String(!!m.ativo);
+
+    setMsg("editMotoristaMsg", "");
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("modalEditarMotorista")).show();
+  }
+
+  async function toggleMotorista(id){
+    const m = cacheMotoristas.find(x => x.id === id);
+    if(!m) return;
+
+    const novo = !m.ativo;
+    const { error } = await sb.from("profiles").update({ ativo: novo }).eq("id", id);
+    if (error) return toast("Erro: " + error.message);
+
+    await loadMotoristas();
+  }
+
+  async function deleteMotorista(id){
+    if(!confirm("Excluir motorista? Se houver serviços/jornadas vinculados, pode falhar. Recomendado desativar.")) return;
+    const { error } = await sb.from("profiles").delete().eq("id", id);
+    if (error) return toast("Erro ao excluir: " + error.message);
+    await loadMotoristas();
+  }
+
+  // salvar edição motorista
+  document.getElementById("formEditarMotorista").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("editMotoristaId").value;
+    const nome = document.getElementById("editMotoristaNome").value.trim();
+    const tipo = document.getElementById("editMotoristaTipo").value;
+    const ativo = document.getElementById("editMotoristaAtivo").value === "true";
+
+    const { error } = await sb.from("profiles").update({ nome, tipo, ativo }).eq("id", id);
+    if (error) { setMsg("editMotoristaMsg", "Erro: " + error.message); return; }
+
+    setMsg("editMotoristaMsg", "Salvo!", true);
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("modalEditarMotorista")).hide();
+    await loadMotoristas();
+  });
+
+  // -----------------------------
+  // Serviços
+  // -----------------------------
+  async function loadMotoristasForSelect(){
+    const { data, error } = await sb
+      .from("profiles")
+      .select("id,nome,role")
+      .in("role", ["motorista_proprio","motorista_terceiro"])
+      .order("nome", { ascending: true });
+
+    if (error) return;
+
+    const sel = document.getElementById("sDriver");
+    sel.innerHTML = `<option value="">(sem motorista)</option>` +
+      (data || []).map(m => `<option value="${m.id}">${esc(m.nome)} • ${esc(m.role)}</option>`).join("");
+  }
+
+  async function loadVeiculosForSelect(){
+    const { data, error } = await sb
+      .from("veiculos")
+      .select("id,placa,modelo,tipo")
+      .eq("ativo", true)
+      .order("placa", { ascending: true });
+
+    if (error) return;
+
+    const sel = document.getElementById("sVeiculo");
+    sel.innerHTML = `<option value="">(sem veículo)</option>` +
+      (data || []).map(v => `<option value="${v.id}">${esc(v.placa)} • ${esc(v.modelo || "—")} (${esc(v.tipo)})</option>`).join("");
+  }
+
+  async function loadServicos(){
+    const el = document.getElementById("listaServicos");
+    el.innerHTML = "Carregando...";
+
+    const { data, error } = await sb
+      .from("servicos")
+      .select(`
+        id,tipo,cliente,endereco,observacoes,status,driver_id,        km_entrega,km_coleta,motivo_nao_entrega,entregue_em,coletado_em,created_at,
+        profiles ( nome, role )
+      `)
+      .order("created_at", { ascending: false });
+
+    if (error) { el.innerHTML = `<div class="text-danger">${esc(error.message)}</div>`; return; }
+    if (!data?.length) { el.innerHTML = `<div class="muted">Nenhum serviço criado ainda.</div>`; return; }
+
+    const tipoLabel = (t) => ({
+      entrega: "Entrega", coleta: "Coleta", entrega_coleta: "Entrega + Coleta"
+    }[t] || t);
+
+    const formatDate = (d) => d ? new Date(d).toLocaleString("pt-BR") : "—";
+
+    el.innerHTML = data.map(s => {
+      const motoristaNome = s.profiles?.nome || "Não atribuído";
+
+      let statusDetalhado = "";
+      if (s.tipo === "entrega") {
+        statusDetalhado = s.entregue_em
+          ? `✅ Entregue em ${formatDate(s.entregue_em)} • KM: ${s.km_entrega ?? "—"}`
+          : `⏳ Entrega pendente`;
+      } else if (s.tipo === "coleta") {
+        statusDetalhado = s.coletado_em
+          ? `✅ Coletado em ${formatDate(s.coletado_em)} • KM: ${s.km_coleta ?? "—"}`
+          : `⏳ Coleta pendente`;
+      } else {
+        const entrega = s.entregue_em
+          ? `✅ Entregue (${formatDate(s.entregue_em)}) • KM: ${s.km_entrega ?? "—"}`
+          : `⏳ Entrega pendente`;
+        const coleta = s.coletado_em
+          ? `✅ Coletado (${formatDate(s.coletado_em)}) • KM: ${s.km_coleta ?? "—"}`
+          : `⏳ Coleta pendente`;
+        statusDetalhado = `${entrega}<br>${coleta}`;
+      }
+
+      // Adicionar motivo se cancelado
+      if (s.status === "cancelado" && s.motivo_nao_entrega) {
+        statusDetalhado += `<br>❌ Motivo: ${esc(s.motivo_nao_entrega)}`;
+      }
+
+      return `
+        <div class="card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold fs-6 text-dark">${esc(s.cliente)} • ${esc(tipoLabel(s.tipo))}</div>
+              <div class="small muted">Criado em: ${esc(formatDate(s.created_at))}</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-danger btn-sm" data-del-servico="${s.id}">
+                <i class="bi bi-trash me-1"></i> Excluir
+              </button>
+              <span class="badge bg-secondary">${esc(s.status)}</span>
+            </div>
+          </div>
+          <hr class="soft-hr my-2"/>
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <div class="small muted">Motorista</div>
+              <div class="fw-semibold">${esc(motoristaNome)}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="small muted">Endereço</div>
+              <div>${esc(s.endereco)}</div>
+            </div>
+            <div class="col-12">
+              <div class="small muted">Status detalhado</div>
+              <div class="fw-semibold">${statusDetalhado}</div>
+            </div>
+            ${s.observacoes ? `
+              <div class="col-12">
+                <div class="small muted">Observações</div>
+                <div>${esc(s.observacoes)}</div>
+              </div>
+            ` : ""}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // Bind excluir serviços
+    document.querySelectorAll("[data-del-servico]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-del-servico");
+        if (confirm("Excluir serviço?")) {
+          try {
+            await deleteService(id);
+            await loadServicos();
+          } catch (e) {
+            toast("Erro ao excluir: " + e.message);
+          }
+        }
+      });
+    });
+  }
+
+  // -----------------------------
+  // Veículos + histórico geral
+  // -----------------------------
+  async function loadVeiculos(){
+    const tbody = document.getElementById("tbodyVeiculos");
+    tbody.innerHTML = `<tr><td colspan="5" class="muted">Carregando...</td></tr>`;
+
+    try{
+      const { data, error } = await sb
+        .from("veiculos")
+        .select("id,placa,modelo,tipo,ativo,created_at")
+        .order("created_at", { ascending:false });
+
+      if (error) throw error;
+
+      const rows = data || [];
+
+      if (!rows.length){
+        tbody.innerHTML = `<tr><td colspan="5" class="muted">Nenhum veículo cadastrado.</td></tr>`;
+        return;
+      }
+
+      cacheVeiculos = rows;
+
+      tbody.innerHTML = rows.map(v => `
+        <tr>
+          <td class="fw-semibold">${v.placa || "—"}</td>
+          <td class="muted">${v.modelo || "—"}</td>
+          <td><span class="badge bg-secondary">${v.tipo || "—"}</span></td>
+          <td>${v.ativo ? `<span class="badge bg-success">ativo</span>` : `<span class="badge bg-danger">inativo</span>`}</td>
+          <td>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-light btn-sm" data-edit-veiculo="${v.id}">
+                <i class="bi bi-pencil me-1"></i> Editar
+              </button>
+              <button class="btn btn-outline-light btn-sm" data-toggle-veiculo="${v.id}">
+                <i class="bi bi-power me-1"></i> ${v.ativo ? "Desativar" : "Ativar"}
+              </button>
+              <button class="btn btn-danger btn-sm" data-del-veiculo="${v.id}">
+                <i class="bi bi-trash me-1"></i> Excluir
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+
+      bindVeiculosActions();
+    } catch(err){
+      console.error("Erro loadVeiculos:", err);
+      tbody.innerHTML = `<tr><td colspan="5" class="text-danger">${err.message}</td></tr>`;
+    }
+  }
+
+  function applyVeiculosFilters(){
+    const q = (document.getElementById("vehSearchTxt").value || "").trim().toLowerCase();
+    const tipo = document.getElementById("vehFilterTipo").value;
+    const ativo = document.getElementById("vehFilterAtivo").value;
+
+    let rows = [...cacheVeiculos];
+
+    if (q) rows = rows.filter(v =>
+      (v.placa || "").toLowerCase().includes(q) ||
+      (v.modelo || "").toLowerCase().includes(q)
+    );
+
+    if (tipo) rows = rows.filter(v => v.tipo === tipo);
+    if (ativo) rows = rows.filter(v => String(!!v.ativo) === ativo);
+
+    const tbody = document.getElementById("tbodyVeiculos");
+
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="5" class="muted">Nenhum veículo encontrado.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(v => `
+      <tr>
+        <td class="fw-semibold">${esc(v.placa)}</td>
+        <td class="muted">${esc(v.modelo || "—")}</td>
+        <td><span class="badge bg-secondary">${esc(v.tipo)}</span></td>
+        <td>${v.ativo ? `<span class="badge bg-success">ativo</span>` : `<span class="badge bg-danger">inativo</span>`}</td>
+        <td>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-light btn-sm" data-edit-veiculo="${v.id}">
+              <i class="bi bi-pencil me-1"></i> Editar
+            </button>
+            <button class="btn btn-outline-light btn-sm" data-toggle-veiculo="${v.id}">
+              <i class="bi bi-power me-1"></i> ${v.ativo ? "Desativar" : "Ativar"}
+            </button>
+            <button class="btn btn-danger btn-sm" data-del-veiculo="${v.id}">
+              <i class="bi bi-trash me-1"></i> Excluir
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+
+    bindVeiculosActions();
+  }
+
+  function bindVeiculosActions(){
+    document.querySelectorAll("[data-edit-veiculo]").forEach(btn => {
+      btn.onclick = () => openEditarVeiculo(btn.getAttribute("data-edit-veiculo"));
+    });
+    document.querySelectorAll("[data-toggle-veiculo]").forEach(btn => {
+      btn.onclick = () => toggleVeiculo(btn.getAttribute("data-toggle-veiculo"));
+    });
+    document.querySelectorAll("[data-del-veiculo]").forEach(btn => {
+      btn.onclick = () => deleteVeiculo(btn.getAttribute("data-del-veiculo"));
+    });
+  }
+
+  function openEditarVeiculo(id){
+    const v = cacheVeiculos.find(x => x.id === id);
+    if(!v) return;
+
+    document.getElementById("editVeiculoId").value = v.id;
+    document.getElementById("editVeiculoPlaca").value = v.placa || "";
+    document.getElementById("editVeiculoModelo").value = v.modelo || "";
+    document.getElementById("editVeiculoTipo").value = v.tipo || "empresa";
+    document.getElementById("editVeiculoAtivo").value = String(!!v.ativo);
+
+    setMsg("editVeiculoMsg", "");
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("modalEditarVeiculo")).show();
+  }
+
+  async function toggleVeiculo(id){
+    const v = cacheVeiculos.find(x => x.id === id);
+    if(!v) return;
+
+    const novo = !v.ativo;
+    const { error } = await sb.from("veiculos").update({ ativo: novo }).eq("id", id);
+    if (error) return toast("Erro: " + error.message);
+
+    await loadVeiculos();
+  }
+
+  async function deleteVeiculo(id){
+    if(!confirm("Excluir veículo? Se houver jornadas vinculadas, pode falhar. Recomendado desativar.")) return;
+    const { error } = await sb.from("veiculos").delete().eq("id", id);
+    if (error) return toast("Erro ao excluir: " + error.message);
+    await loadVeiculos();
+  }
+
+  // salvar edição veículo
+  document.getElementById("formEditarVeiculo").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("editVeiculoId").value;
+    const placa = document.getElementById("editVeiculoPlaca").value.trim().toUpperCase();
+    const modelo = document.getElementById("editVeiculoModelo").value.trim();
+    const tipo = document.getElementById("editVeiculoTipo").value;
+    const ativo = document.getElementById("editVeiculoAtivo").value === "true";
+
+    const { error } = await sb.from("veiculos").update({ placa, modelo, tipo, ativo }).eq("id", id);
+    if (error) { setMsg("editVeiculoMsg", "Erro: " + error.message); return; }
+
+    setMsg("editVeiculoMsg", "Salvo!", true);
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("modalEditarVeiculo")).hide();
+    await loadVeiculos();
+  });
+
+  async function loadHistoricoAllVeiculos(){
+    const el = document.getElementById("historicoAllVeiculos");
+    el.innerHTML = "Carregando...";
+
+    try {
+      // Query 1: Serviços concluídos
+      const { data: servicos, error: e1 } = await sb
+        .from("servicos")
+        .select("*")
+        .in("status", ["entregue", "coletado"])
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (e1) throw e1;
+
+      if (!servicos?.length) {
+        el.innerHTML = `<div class="muted">Nenhuma entrega ou coleta concluída.</div>`;
+        return;
+      }
+
+      // Query 2: Motoristas (de profiles)
+      const driverIds = [...new Set(servicos.map(s => s.driver_id))];
+      const { data: drivers, error: e2 } = await sb
+        .from("profiles")
+        .select("id, nome")
+        .in("id", driverIds);
+
+      if (e2) throw e2;
+
+      const driversMap = new Map(drivers?.map(d => [d.id, d]) || []);
+
+      // Query 3: Jornadas para veículos (busca todas jornadas do motorista, prioriza abertas)
+      const motoristaIds = [...new Set(servicos.map(s => s.driver_id))];
+      const { data: jornadas, error: e3 } = await sb
+        .from("jornadas")
+        .select("motorista_id, veiculos(placa, modelo), aberta")
+        .in("motorista_id", motoristaIds)
+        .order("aberta", { ascending: false })  // Abertas primeiro
+        .order("created_at", { ascending: false });  // Depois por data
+
+      if (e3) throw e3;
+
+      const veiculosMap = new Map();
+      jornadas?.forEach(j => {
+        if (j.veiculos && !veiculosMap.has(j.motorista_id)) {
+          veiculosMap.set(j.motorista_id, j.veiculos);  // Pega o veículo da jornada mais relevante
+        }
+      });
+
+      // Aplicar filtro por placa (case-insensitive, parcial)
+      const placaFilter = (document.getElementById("histPlacaFilter")?.value || "").trim().toLowerCase();
+      let filteredServicos = servicos;
+      if (placaFilter) {
+        filteredServicos = servicos.filter(s => {
+          const veiculo = veiculosMap.get(s.driver_id);
+          return veiculo?.placa?.toLowerCase().includes(placaFilter);
+        });
+      }
+
+      if (!filteredServicos.length) {
+        el.innerHTML = `<div class="muted">Nenhuma entrega ou coleta encontrada para o filtro "${placaFilter}".</div>`;
+        return;
+      }
+
+      // Render como lista de cards detalhados (inclui KM)
+      el.innerHTML = filteredServicos.map(s => {
+        const motorista = driversMap.get(s.driver_id);
+        const veiculo = veiculosMap.get(s.driver_id);
+        const tipoLabel = s.tipo === "entrega" ? "Entrega" : s.tipo === "coleta" ? "Coleta" : "Entrega + Coleta";
+        const statusBadge = s.status === "entregue" ? `<span class="badge bg-success">Entregue</span>` : `<span class="badge bg-success">Coletado</span>`;
+        const kmInfo = s.km_entrega ? `KM Entrega: ${s.km_entrega}` : s.km_coleta ? `KM Coleta: ${s.km_coleta}` : "KM não informado";
+
+        return `
+          <div class="card glass p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-semibold fs-6 text-dark">${esc(s.cliente)} • ${tipoLabel}</div>
+                <div class="small text-muted">Criado em: ${new Date(s.created_at).toLocaleString("pt-BR")}</div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-danger btn-sm" data-del-hist-servico="${s.id}">
+                  <i class="bi bi-trash me-1"></i> Excluir
+                </button>
+                ${statusBadge}
+              </div>
+            </div>
+            <hr class="soft my-2"/>
+            <div class="row g-2">
+              <div class="col-12 col-md-6">
+                <div class="small text-muted">Motorista</div>
+                <div class="fw-semibold text-dark">${esc(motorista?.nome || "—")}</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="small text-muted">Veículo</div>
+                <div class="fw-semibold text-dark">${veiculo ? `${esc(veiculo.placa)} (${esc(veiculo.modelo || "—")})` : "Veículo não associado"}</div>
+              </div>
+              <div class="col-12">
+                <div class="small text-muted">Endereço</div>
+                <div class="text-dark">${esc(s.endereco || "—")}</div>
+              </div>
+              <div class="col-12">
+                <div class="small text-muted">KM</div>
+                <div class="fw-semibold text-dark">${kmInfo}</div>
+              </div>
+              ${s.observacoes ? `
+                <div class="col-12">
+                  <div class="small text-muted">Observações</div>
+                  <div class="text-dark">${esc(s.observacoes)}</div>
+                </div>
+              ` : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Bind excluir histórico serviços
+      document.querySelectorAll("[data-del-hist-servico]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-del-hist-servico");
+          if (confirm("Excluir serviço do histórico?")) {
+            try {
+              await deleteService(id);
+              await loadHistoricoAllVeiculos();
+            } catch (e) {
+              toast("Erro ao excluir: " + e.message);
+            }
+          }
+        });
+      });
+    } catch (err) {
+      console.error("Erro em loadHistoricoAllVeiculos:", err);
+      el.innerHTML = `<div class="text-danger">Erro: ${err.message}</div>`;
+    }
+  }
+
+    // -----------------------------
+  // Função deleteService
+  // -----------------------------
+  async function deleteService(serviceId) {
+    const { error } = await sb
+      .from("servicos")
+      .delete()
+      .eq("id", serviceId);
+    if (error) throw error;
+  }
+
+  // -----------------------------
+  // Dashboard histórico + status
+  // -----------------------------
+  async function loadHistorico(){
+    const el = document.getElementById("historicoJornadas");
+    el.innerHTML = "Carregando...";
+
+    const { data, error } = await sb
+      .from("jornadas")
+      .select("id,km_inicial,km_final,aberta_em,encerrada_em,aberta, profiles(nome), veiculos(placa)")
+      .order("aberta_em", { ascending:false })
+      .limit(20);
+
+    if (error) { el.innerHTML = `<div class="text-danger">${esc(error.message)}</div>`; return; }
+    if (!data?.length) { el.innerHTML = `<div class="muted">Nenhuma movimentação registrada.</div>`; return; }
+
+    el.innerHTML = data.map(j => `
+      <div class="border-bottom py-2" style="border-color:#c8e6c9!important;">
+        <div class="fw-semibold text-dark">
+          ${esc(j.veiculos?.placa || "—")} • ${esc(j.profiles?.nome || "—")}
+        </div>
+        <div class="small muted">
+          Saída: ${new Date(j.aberta_em).toLocaleString("pt-BR")}
+          ${j.encerrada_em ? `<br>Retorno: ${new Date(j.encerrada_em).toLocaleString("pt-BR")}` : `<br><span class="text-warning">Em rota</span>`}
+        </div>
+        <div class="small muted">KM: ${esc(j.km_inicial)} → ${esc(j.km_final ?? "—")}</div>
+      </div>
+    `).join("");
+  }
+
+  async function loadStatusCaminhoes(){
+    const el = document.getElementById("statusCaminhoes");
+    el.innerHTML = "Carregando...";
+
+    const { data, error } = await sb
+      .from("jornadas")
+      .select("id,aberta,aberta_em, veiculos(placa), profiles(nome)")
+      .eq("aberta", true)
+      .order("aberta_em", { ascending:false });
+
+    if (error) { el.innerHTML = `<div class="text-danger">${esc(error.message)}</div>`; return; }
+
+    if (!data?.length){
+      el.innerHTML = `<div class="text-success">Todos os caminhões estão na empresa.</div>`;
+      return;
+    }
+
+    el.innerHTML = data.map(j => `
+      <div class="border-bottom py-2" style="border-color:#c8e6c9!important;">
+        <div class="text-warning fw-semibold">🚛 ${esc(j.veiculos?.placa || "—")} em rota</div>
+        <div class="small muted">Motorista: ${esc(j.profiles?.nome || "—")}</div>
+        <div class="small muted">Saída: ${new Date(j.aberta_em).toLocaleString("pt-BR")}</div>
+      </div>
+    `).join("");
+  }
+
+  async function loadDashboard(){
+    await loadPendentes();
+    await loadMotoristas();
+    await loadHistorico();
+    await loadStatusCaminhoes();
+  }
+
+  // -----------------------------
+  // Eventos
+  // -----------------------------
+  document.getElementById("btnDash").addEventListener("click", async () => {
+    showView("dash");
+    await loadDashboard();
+  });
+
+  document.getElementById("btnMotoristas").addEventListener("click", async () => {
+    showView("motoristas");
+    await loadMotoristas();
+  });
+
+  document.getElementById("btnServicos").addEventListener("click", async () => {
+    showView("servicos");
+    await loadMotoristasForSelect();
+    await loadVeiculosForSelect();
+    await loadServicos();
+  });
+
+  document.getElementById("btnVeiculos").addEventListener("click", async ()=> {
+    showView("veiculos");
+    await loadVeiculos();
+    await loadHistoricoAllVeiculos();
+  });
+
+  document.getElementById("btnLogout").addEventListener("click", async () => {
+    await sb.auth.signOut();
+    location.href = "index.html";
+  });
+
+  document.getElementById("btnRefreshDash").addEventListener("click", async () => {
+    await loadDashboard();
+  });
+
+  document.getElementById("btnApplyFilters").addEventListener("click", applyMotoristasFilters);
+  document.getElementById("searchTxt").addEventListener("input", applyMotoristasFilters);
+  document.getElementById("filterTipo").addEventListener("change", applyMotoristasFilters);
+  document.getElementById("filterAtivo").addEventListener("change", applyMotoristasFilters);
+
+  document.getElementById("vehSearchTxt").addEventListener("input", applyVeiculosFilters);
+  document.getElementById("vehFilterTipo").addEventListener("change", applyVeiculosFilters);
+  document.getElementById("vehFilterAtivo").addEventListener("change", applyVeiculosFilters);
+
+  document.getElementById("btnRefreshHistAll").addEventListener("click", loadHistoricoAllVeiculos);
+  document.getElementById("histPlacaFilter").addEventListener("input", loadHistoricoAllVeiculos);
+
+  // -----------------------------
+  // Pré-cadastro motorista
+  // -----------------------------
+  document.getElementById("formCriarMotorista").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nome = document.getElementById("mNome").value.trim();
+  const email = document.getElementById("mEmail").value.trim().toLowerCase();
+  const tipo = document.getElementById("mTipo").value;
+
+  console.log("Tipo selecionado:", tipo);  // Depuração: deve mostrar "terceiro" se selecionado
+
+  if (!nome || !email || !tipo) {
+    alert("Preencha todos os campos obrigatórios, incluindo tipo.");
+    return;
+  }
+
+  // Validação básica de email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert("Digite um email válido.");
+    return;
+  }
+
+  try {
+    // Checar se email já existe em profiles_pending
+    const { data: existing, error: checkError } = await sb
+      .from("profiles_pending")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (checkError) throw checkError;
+    if (existing) {
+      alert("Este email já está pré-cadastrado. Use outro email.");
+      return;
+    }
+
+    // Inserir pré-cadastro
+    const { error } = await sb.from("profiles_pending").insert({
+      email,
+      nome,
+      role: "motorista",
+      tipo
+    });
+
+    if (error) throw error;
+
+    alert("Pré-cadastro criado com sucesso! O motorista deve criar a senha no primeiro acesso.");
+    e.target.reset();  // Limpar o form
+  } catch (err) {
+    console.error("Erro no pré-cadastro:", err);
+    alert("Erro no pré-cadastro: " + (err.message || "Verifique os dados e tente novamente."));
+  }
+});
+
+  // -----------------------------
+  // Criar serviço
+  // -----------------------------
+  document.getElementById("formCriarServico").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const btn = document.getElementById("btnCriarServico");
+    btn.disabled = true;
+    btn.textContent = "Criando...";
+    setMsg("servicoMsg", "Salvando...");
+
+    try {
+      const tipo = document.getElementById("sTipo").value;
+      const cliente = document.getElementById("sCliente").value.trim();
+      const endereco = document.getElementById("sEndereco").value.trim();
+      const observacoes = document.getElementById("sObs").value.trim();
+      const driver_id = document.getElementById("sDriver").value || null;
+      const veiculo_id = document.getElementById("sVeiculo").value || null;
+
+      // Validações extras
+      if (!tipo || !cliente || !endereco) {
+        throw new Error("Preencha tipo, cliente e endereço.");
+      }
+      if (!["entrega", "coleta", "entrega_coleta"].includes(tipo)) {
+        throw new Error("Tipo inválido.");
+      }
+
+      console.log("Dados do serviço:", { tipo, cliente, endereco, observacoes, driver_id, status: driver_id ? "em_rota" : "pendente" });  // Debug
+
+      // Inserir serviço e obter o ID
+      const { data: newService, error } = await sb.from("servicos").insert({
+        tipo, cliente, endereco,
+        observacoes: observacoes || null,
+        driver_id,
+        status: driver_id ? "em_rota" : "pendente"
+      }).select("*").single();
+
+      if (error) {
+        console.error("Erro no insert:", error);  // Debug
+        throw error;
+      }
+
+      // Se motorista atribuído, criar jornada e associar ao serviço
+      if (driver_id) {
+        console.log("Criando jornada para driver:", driver_id, "veículo:", veiculo_id);  // Debug
+        await assignServiceWithJourney(newService.id, driver_id, veiculo_id);
+      }
+
+      setMsg("servicoMsg", "Serviço criado!", true);
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("modalCriarServico")).hide();
+      document.getElementById("formCriarServico").reset();
+      await loadServicos();
+    } catch (err) {
+      console.error("Erro completo:", err);  // Debug
+      setMsg("servicoMsg", "Erro: " + (err?.message || err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Criar serviço";
+    }
+  });
+
+  // -----------------------------
+  // Criar veículo
+  // -----------------------------
+  document.getElementById("formVeiculo").addEventListener("submit", async (e)=> {
+    e.preventDefault();
+
+    const placa = document.getElementById("vPlaca").value.trim().toUpperCase();
+    const modelo = document.getElementById("vModelo").value.trim();
+    const tipo = document.getElementById("vTipo").value;
+
+    const { error } = await sb.from("veiculos").insert({ placa, modelo, tipo, ativo: true });
+
+    if (error){
+      setMsg("veiculoMsg", "Erro: " + error.message);
+      return;
+    }
+
+    setMsg("veiculoMsg", "Veículo criado!", true);
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("modalVeiculo")).hide();
+    document.getElementById("formVeiculo").reset();
+    await loadVeiculos();
+  });
+
+  // -----------------------------
+  // Init
+  // -----------------------------
+  (async function init(){
+    const user = await ensureLogged();
+    if (!user) return;
+
+    showView("dash");
+    await loadDashboard();
+  })();
+</script>
+</body>
+</html>
+       
